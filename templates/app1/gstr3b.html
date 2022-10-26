@@ -1,0 +1,90 @@
+{% extends 'app1/base.html' %}
+{% block body %}
+    {% load static %}
+    {% if user.is_authenticated %}
+
+        </head>
+        <body>
+
+        <!-- Trigger/Open The Modal -->
+<div class="page-content">
+    <div class="card radius-15">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4"></div>
+                    <div class="col-md-5"><h2 style="padding-left: 80px;">GSTR-3B</h2>
+                    </div>
+                </div> <hr>
+            </div>
+        </div>
+
+        <div class="card radius-15" style="background-color: #243e54;">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col" style="border-right:solid 1px gray; margin-top: 10px; margin-bottom: 10px;text-align:center;">
+                        <div class="row">
+                            <div class="col">
+                            <h5>OVERALL SUMMARY</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>       &nbsp;
+
+                <div class="card radius-15">
+                    <div class="card-body">
+                        <div>
+                            &nbsp;<br>
+                        </div>
+                        <div class="tab-content card-body" id="myTabContent">
+                            <div class="tab-pane fade show active" id="Returns" >
+                                    <br><br>
+
+                                    <table class="table table-responsive-md text-center">
+                                        <tbody>
+                                        <tr>
+                                            <th>Particulars</th>
+                                            <th>Voucher Count</th>
+                                            <th>Taxable Amount</th>
+                                            <th>IGST</th>
+                                            <th>CGST</th>
+                                            <th>SGST</th>
+                                            <th>Cess</th>
+                                            <th>Tax Amount</th>
+                                            <th>Invoice Amount</th>
+
+                                        </tr>
+                                        </tbody>
+                                        <tbody>
+                                        <tr>
+                                            <td id="fd"></td>
+                                            <td id="ld"></td>
+                                       
+                                            <td></td>
+                                            <td id="ad" class="ad"> </td>
+                                            <td>{{ cgst.total }}</td>
+                                            <td id="bal"></td>
+                                            <td></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    
+
+
+
+                </div>
+            </div>
+
+        </body>
+    {% endif %}
+
+
+
+{% endblock %}

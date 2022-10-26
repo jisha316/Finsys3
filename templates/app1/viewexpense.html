@@ -1,0 +1,145 @@
+{% extends 'app1/base.html' %}
+{% block body %}
+    {% load static %}
+
+    <style>
+        .card-registration .select-input.form-control[readonly]:not([disabled]) {
+            font-size: 1rem;
+            line-height: 2.15;
+            padding-left: .75em;
+            padding-right: .75em;
+        }
+        .card-registration .select-arrow {
+            top: 13px;
+        }
+        .bg-grey {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        @media (min-width: 992px) {
+            .card-registration-2 .bg-grey {
+                border-top-right-radius: 16px;
+                border-bottom-right-radius: 16px;
+            }
+        }
+        @media (max-width: 991px) {
+            .card-registration-2 .bg-grey {
+                border-bottom-left-radius: 16px;
+                border-bottom-right-radius: 16px;
+            }
+        }
+        .vl {
+            border-left: 6px solid gray;
+        }
+    </style>
+
+    <div class="page-content">
+        <div class="card card-registration card-registration-2" style="border-radius: 15px;">
+            <div class="card-body p-0">
+                <div class="row g-0">
+                    <div class="col-lg-8">
+                        <div class="p-5">
+                            <p class="text-muted">Expense Amount</p>
+                            <div class="d-flex justify-content-between align-items-center mb-5">
+                                <h1 class="fw-bold mb-0 text-black">{{ expnce.amount }} <span class="text-muted" style="font-size: 20px;">INR</span></h1>
+                                <h6 class="mb-0 text-muted">{{ cmp1.cname }}</h6>
+                            </div>
+                            <hr class="my-4">
+                            <div class="row mb-4 d-flex justify-content-between align-items-center">
+                                <div class="col-md-2 mt-3">
+                                    <h6 class="mb-0">Date</h6>
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <p class="mb-0">{{ expnce.date |date:'d-m-Y' }}</p>
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <h6 class="mb-0">{{ expnce.expenseaccount }}</h6>
+                                </div>
+                            </div>
+                            <div class="row mb-4 d-flex justify-content-between align-items-center">
+                                <div class="col-md-3 mt-3">
+                                    <h6 class="mb-0">Expense Type</h6>
+                                </div>
+                                <div class="col-md-2 mt-3">
+                                    <p class="mb-0">{{ expnce.expensetype }}</p>
+                                </div>
+                                <div class="col-md-2 mt-3 vl">
+                                    <h6 class="mb-0">Hsn/Sac</h6>
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <p class="mb-0">{{ expnce.hsn_sac }}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-4 d-flex justify-content-between align-items-center">
+                                <div class="col-md-3 mt-3">
+                                    <h6 class="mb-0">Reference</h6>
+                                </div>
+                                <div class="col-md-2 mt-3">
+                                    <p class="mb-0">{{ expnce.reference }}</p>
+                                </div>
+                                <div class="col-md-2 mt-3 vl">
+                                    <h6 class="mb-0">Tax</h6>
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <p class="mb-0">{{ expnce.tax }}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-4 d-flex justify-content-between align-items-center">
+                                <div class="col-md-3 mt-3">
+                                    <h6 class="mb-0">Customer</h6>
+                                </div>
+                                <div class="col-md-2 mt-3">
+                                    <p class="mb-0">{{ expnce.customer }}</p>
+                                </div>
+                                <div class="col-md-3 mt-3 vl">
+                                    <h6 class="mb-0">Paid Through</h6>
+                                </div>
+                                <div class="col-md-3 mt-3">
+                                    <p class="mb-0">{{ expnce.paidthrough }}</p>
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 bg-grey">
+                        <div class="p-5">
+                            <div class="d-flex justify-content-between mb-4">
+                                <h5 class="">Vendor</h5>
+                                <h6>{{ expnce.vendor }}</h6>
+                            </div>
+                            <h5 class="mb-3">GST Type</h5>
+                            <div class="mb-4 pb-2">
+                                {{ expnce.gsttype }}
+                            </div>
+                            <hr class="my-4">
+                            <div class="d-flex justify-content-between mb-5">
+                                <h6 class="">Sorce Of Supply</h6>
+                                <h6>{{ expnce.sourceofsupply }}</h6>
+                            </div>
+                            <div class="d-flex justify-content-between mb-5">
+                                <h6 class="">Destination of Supply</h6>
+                                <h6>{{ expnce.destinofsupply }}</h6>
+                            </div> 
+                            <div class="d-flex justify-content-between mb-5">
+                                <h6 class="">Note</h6>
+                                <h6>{{ expnce.note }}</h6>
+                            </div> 
+                            <div>
+                                <center>
+                                    <a href="{% url 'goeditexpense' expnce.expenseid %}" class="btn btn-outline-info rounded-pill text-grey mt-3 mb-3" role="button">
+                                        Edit
+                                    </a>&nbsp;&nbsp;&nbsp;
+                                    <a href="{% url 'deleteexpense' expnce.expenseid %}" class="btn btn-outline-info rounded-pill text-grey mt-3 mb-3" role="button">
+                                        Delete
+                                    </a>
+                                </center>
+                                
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}
