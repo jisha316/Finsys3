@@ -10,8 +10,7 @@ from datetime import datetime, date, timedelta
 from .models import advancepayment, paydowncreditcard, salesrecpts, timeact, timeactsale, Cheqs, suplrcredit, addac, \
     bills, invoice, expences, payment, credit, delayedcharge, estimate, service, noninventory, bundle, employee, \
     payslip, inventory, customer, supplier, company, accounts, ProductModel, ItemModel, accountype, \
-    expenseaccount, incomeaccount, accounts1, recon1, recordpay, addtax1, bankstatement, customize,\
-    vendor,purchaseorder,porder_item,purchasebill,bill_item,purchase_expense
+    expenseaccount, incomeaccount, accounts1, recon1, recordpay, addtax1, bankstatement, customize
 
 from django.contrib.auth.models import auth, User
 from django.contrib import messages
@@ -28827,7 +28826,7 @@ def vendordetails(request):
                             pincode=pincode, country=country,
                             shipstreet=shipstreet, shipcity=shipcity,
                             shipstate=shipstate,
-                            shippincode=shippincode, shipcountry=shipcountry)
+                            shippincode=shippincode, shipcountry=shipcountry,cid=cmp1)
 
             vndr.save()
             return redirect('govendor')
@@ -30211,6 +30210,150 @@ def viewpurchasedebit(request,id):
         pdeb = purchasedebit1.objects.all().filter(pdebit=id)
         return render(request,'app1/viewpurchasedebit.html',{'cmp1': cmp1,'pdebt':pdebt,'pdeb':pdeb})
     return redirect('gopurchasedebit')
+
+def purchase_acctransactions(request,id):
+    if 'uid' in request.session:
+        if request.session.has_key('uid'):
+            uid = request.session['uid']
+        else:
+            return redirect('/')
+        cmp1 = company.objects.get(id=request.session['uid'])
+        x = id.split()
+        x.append(" ")
+        a = x[0]
+        b = x[1]
+
+        toda = date.today()
+        tod = toda.strftime("%Y-%m-%d")
+
+        to=toda.strftime("%d-%m-%Y")
+        
+        vndrobject = vendor.objects.get(firstname=a, lastname=b, cid=cmp1)
+        opnbal =vndrobject.openingbalance
+        print(opnbal) 
+        
+        statment = vendor_statment.objects.filter(vendor=id,cid=cmp1)
+        debit=0
+        credit=0
+        total1 = 0
+
+        for i in statment :
+            if i.amount:
+                debit+=i.amount
+            if i.payments:
+                credit+=i.payments
+
+        total1=debit-credit          
+
+        bal=vndrobject.openingbalance
+        for i in statment:
+            if i.transactions =="Billed":
+                i.balance = bal + i.amount
+                bal = i.balance
+            # if i.transactions =="Payable":
+                # i.balance = bal - i.payments
+                # bal = i.balance
+            i.save() 
+        print(bal)
+
+        fdate =""
+        ldate =""
+
+        context = {
+            "statment":statment,
+            "cmp1":cmp1,
+            'total1':total1,
+            'credit':credit,
+            'debit':debit,
+            'vndr2':id,
+            'to':to,
+            'fdate':fdate,
+            'ldate':ldate,
+            
+        }
+        return render(request,'app1/purchase_acctransactions.html',context)
+    return redirect('/')
+
+def purchase_acctransactions1(request):
+    if request.method =="POST":
+        vndr = request.POST['vndr']
+        select=request.POST['reportperiod']
+        if select =="All dates":
+            return redirect('purchase_acctransactions',vndr)
+        if select == "Custom":
+            fdate = request.POST['fdate']
+            ldate = request.POST['ldate']
+            cmp1 = company.objects.get(id=request.session["uid"])
+            print(fdate)
+
+            x = vndr.split()
+            x.append(" ")
+            a = x[0]
+            b = x[1]
+            cu = a +" "+ b
+            vndrobject = vendor.objects.get(firstname=a, lastname=b,cid=cmp1)
+            opnbal =vndrobject.openingbalance
+            print(opnbal) 
+
+            statment1 = vendor_statment.objects.filter(vendor=cu,cid=cmp1)
+            bal=0
+            for i in statment1:
+                if i.transactions =="Billed":
+                    if i.amount:
+                        i.balance = bal + i.amount
+                        bal = i.balance
+                if i.transactions =="Payable":
+                    if i.payments:
+                        i.balance = bal-i.payments
+                i.save() 
+
+            preamount=0
+            prepayment=0
+            prebalance = 0
+            prev_balance = vendor_statment.objects.filter(vendor=cu,date__lt=fdate)
+            for j in prev_balance:
+                if j.amount:
+                    preamount += j.amount
+
+                if j.payments:
+                    prepayment += j.payments
+    
+
+            prebalance = preamount-prepayment
+            print(prebalance)   
+
+            statment = vendor_statment.objects.filter(vendor=cu,cid=cmp1,date__gte=fdate,date__lte=ldate)
+            bal=0
+            for i in statment:
+                if i.transactions =="Billed":
+                    if i.amount:
+                        i.balance = bal + i.amount
+                        bal = i.balance
+                if i.transactions =="Payable":
+                    if i.payments:
+                        i.balance = bal-i.payments
+                i.save()  
+            value = ""
+            if statment.exists():
+                value=1
+
+            debit=0
+            credit=0
+            total1 = 0
+    
+            for i in statment :
+                if i.amount:
+                    debit+=i.amount
+                if i.payments:
+                    credit+=i.payments
+            total1=prebalance+debit-credit   
+
+            bal=vndrobject.openingbalance
+            
+            context = {'statment':statment, 'cmp1':cmp1,'total1':total1,'credit':credit,'vndr2':vndr,'prebalance':prebalance,'fdate':fdate,
+                'ldate':ldate,'value':value,'debit':debit
+            }
+            return render(request,'app1/purchase_acctransactions.html',context)
 
 def demo(request):
     if 'uid' in request.session:

@@ -1427,6 +1427,7 @@ class ewayinv(models.Model):
 
 class vendor(models.Model):
     vendorid = models.AutoField(('VENID'), primary_key=True)
+    cid = models.ForeignKey(company, on_delete=models.CASCADE,null=True)
     title = models.CharField(max_length=10,null=True)
     firstname = models.CharField(max_length=100)
     lastname = models.CharField(max_length=100,null=True)
@@ -1618,9 +1619,3 @@ class vendor_statment(models.Model):
     amount	= models.FloatField(blank=True,null=True)
     payments=models.FloatField(default='',null=True)	
     balance=models.FloatField(blank=True,null=True)
-
-# class vendor_statment1(models.Model):
-#     pblno = models.CharField(max_length=100,blank=True,null=True)
-#     duedt = models.DateField(blank=True,null=True)
-#     paymnt1=models.ForeignKey(purchasepayment1,on_delete=models.CASCADE,blank=True,null=True)
-#     paymnt2=models.ForeignKey(purchasepayment,on_delete=models.CASCADE,blank=True,null=True)

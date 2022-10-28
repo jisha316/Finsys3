@@ -58,15 +58,17 @@
                             </thead>
                             <tbody>
                             {% for v in vndr %}
-                            <tr onclick="window.location='vendorprofile/{{ v.vendorid }}';">
-                                <td>{{ v.firstname }} {{ v.lastname }}</td>
-                                <td>{{ v.companyname }}</td>
-                                <td>{{ v.email }}</td>
-                                <td>{{ v.mobile }}</td>
-                                <td>{{ v.gsttype }}</td>
-                                <td>{{ v.gstin }}</td>
-                                <td>{{ v.panno }}</td>
-                            </tr>
+                                {% if v.cid_id == cmp1.cid %}
+                                    <tr onclick="window.location='vendorprofile/{{ v.vendorid }}';">
+                                        <td>{{ v.firstname }} {{ v.lastname }}</td>
+                                        <td>{{ v.companyname }}</td>
+                                        <td>{{ v.email }}</td>
+                                        <td>{{ v.mobile }}</td>
+                                        <td>{{ v.gsttype }}</td>
+                                        <td>{{ v.gstin }}</td>
+                                        <td>{{ v.panno }}</td>
+                                    </tr>
+                                {% endif %}
                             {% endfor %}
                             </tbody>
                         </table>

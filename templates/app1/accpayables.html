@@ -10,6 +10,9 @@
             margin-top: -30px;
             /* margin-top: 392px; */
         }
+        .table-row{
+            cursor:pointer;
+    }
     </style>
 
     <div class="page-content">
@@ -160,7 +163,7 @@
                                     {% endfor %}
 
                                     {% for pb in pbl %}
-                                        <tr>
+                                        <tr class="table-row"  onclick=window.location='{% url "purchase_acctransactions" pb.vendor_name %}';>
                                             <td class="center text-dark">{{ pb.vendor_name }}</td>
                                             <td class="center text-dark">Bill Balance Due</td>
                                             <td class="center text-dark">{{ pb.t1 }}</td>
