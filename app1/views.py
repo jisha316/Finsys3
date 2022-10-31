@@ -28768,7 +28768,7 @@ def govendor(request):
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
         vndr = vendor.objects.all()
-        return render(request,'app1/vendor.html',{'cmp1': cmp1,'vndr':vndr})
+        return render(request,'app1/govendor.html',{'cmp1': cmp1,'vndr':vndr})
     return redirect('govendor')
 
 @login_required(login_url='regcomp')
@@ -28784,7 +28784,7 @@ def addvendor(request):
     return redirect('addvendor')
 
 @login_required(login_url='regcomp')
-def vendordetails(request):
+def createvendor(request):
     if 'uid' in request.session:
         if request.session.has_key('uid'):
             uid = request.session['uid']
@@ -28830,11 +28830,11 @@ def vendordetails(request):
 
             vndr.save()
             return redirect('govendor')
-        return render(request,'app1/vendor.html',{'cmp1': cmp1})
+        return render(request,'app1/addvendor.html',{'cmp1': cmp1})
     return redirect('/')
 
 @login_required(login_url='regcomp')
-def vendorprofile(request, id):
+def viewvendor(request, id):
     if 'uid' in request.session:
         if request.session.has_key('uid'):
             uid = request.session['uid']
@@ -28898,8 +28898,8 @@ def vendorprofile(request, id):
                     'paymnt':paymnt,'pordr':pordr,'expnc':expnc,'statment':statment,'tot6':tot6,'tot7':tot7,'tot1':tot1,'tot2':tot2
 
                 }
-        return render(request,'app1/vendorprofile.html',context)
-    return redirect('vendorprofile')
+        return render(request,'app1/viewvendor.html',context)
+    return redirect('viewvendor')
 
 @login_required(login_url='regcomp')
 def searchdate(request):
@@ -28938,7 +28938,7 @@ def searchdate(request):
         tot1 = purchasepayment.objects.filter(paymentdate__gte=fromdate, paymentdate__lte=todate).aggregate(t2=Sum('paymentamount'))
         tot7 = purchasepayment.objects.filter(paymentdate__gte=fromdate, paymentdate__lte=todate).aggregate(t2=Sum('amtcredit'))
         context = {'cmp1':cmp1,'tot6':tot6,'tot7':tot7,'tot1':tot1,'tot2':tot2}
-        return render(request,'app1/vendorprofile.html',context)
+        return render(request,'app1/viewvendor.html',context)
     return redirect('searchdate')
 
 @login_required(login_url='regcomp')
@@ -28990,7 +28990,7 @@ def editvendor(request,id):
 
             vndr.save()
             return redirect('govendor')
-        return render(request,'vendor.html')
+        return render(request,'govendor.html')
     return redirect('/')
 
 @login_required(login_url='regcomp')
@@ -29294,7 +29294,7 @@ def gopurchaseorder(request):
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
         pordr = purchaseorder.objects.all()
-        return render(request,'app1/purchaseorder.html',{'cmp1': cmp1,'pordr':pordr})
+        return render(request,'app1/gopurchaseorder.html',{'cmp1': cmp1,'pordr':pordr})
     return redirect('gopurchaseorder')
 
 @login_required(login_url='regcomp')
@@ -29319,7 +29319,7 @@ def addpurchaseorder(request):
         return render(request,'app1/addpurchaseorder.html',context)
     return redirect('addpurchaseorder')
 
-def purchase_order(request):
+def createpurchaseorder(request):
     if 'uid' in request.session:
         if request.session.has_key('uid'):
             uid = request.session['uid']
@@ -29378,10 +29378,10 @@ def purchase_order(request):
                 mapped=zip(items,quantity,rate,tax,amount)
                 mapped=list(mapped)
                 for ele in mapped:
-                    porderAdd,created = porder_item.objects.get_or_create(items = ele[0],quantity=ele[1],rate=ele[2],
+                    porderAdd,created = purchaseorder_item.objects.get_or_create(items = ele[0],quantity=ele[1],rate=ele[2],
                     tax=ele[3],amount=ele[4],pid=prid)
             return redirect('gopurchaseorder')
-        return render(request,'app1/purchaseorder.html',{'cmp1': cmp1})
+        return render(request,'app1/gopurchaseorder.html',{'cmp1': cmp1})
     return redirect('/') 
 
 @login_required(login_url='regcomp')
@@ -29393,8 +29393,8 @@ def viewpurchaseorder(request,id):
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
         pordr=purchaseorder.objects.get(porderid=id)
-        pitem = porder_item.objects.all().filter(pid=id)
-        return render(request,'app1/view_prchsorder.html',{'cmp1': cmp1,'pordr':pordr,'pitem':pitem})
+        pitem = purchaseorder_item.objects.all().filter(pid=id)
+        return render(request,'app1/viewpurchaseorder.html',{'cmp1': cmp1,'pordr':pordr,'pitem':pitem})
     return redirect('gopurchaseorder')
 
 @login_required(login_url='regcomp')
@@ -29406,7 +29406,7 @@ def goeditpurchaseorder(request,id):
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
         pordr=purchaseorder.objects.get(porderid=id)
-        pitem = porder_item.objects.all().filter(pid=id)
+        pitem = purchaseorder_item.objects.all().filter(pid=id)
         return render(request,'app1/editpurchaseorder.html',{'cmp1': cmp1,'pordr':pordr,'pitem':pitem})
     return redirect('gopurchaseorder')
 
@@ -29459,10 +29459,10 @@ def editpurchaseorder(request,id):
                 mapped=zip(items,quantity,rate,tax,amount)
                 mapped=list(mapped)
                 for ele in mapped:
-                    porderAdd,created = porder_item.objects.get_or_create(items = ele[0],quantity=ele[1],rate=ele[2],
+                    porderAdd,created = purchaseorder_item.objects.get_or_create(items = ele[0],quantity=ele[1],rate=ele[2],
                     tax=ele[3],amount=ele[4],pid=pitem)
             return redirect('gopurchaseorder')
-        return render(request,'app1/purchaseorder.html',{'cmp1': cmp1})
+        return render(request,'app1/gopurchaseorder.html',{'cmp1': cmp1})
     return redirect('/') 
 
 
@@ -29475,7 +29475,7 @@ def deletepurchasorder(request, id):
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
         pordr=purchaseorder.objects.get(porderid=id)
-        pitem = porder_item.objects.all().filter(pid=id)
+        pitem = purchaseorder_item.objects.all().filter(pid=id)
         pordr.delete() 
         pitem.delete() 
         return redirect('gopurchaseorder')
@@ -29508,7 +29508,7 @@ def convertbilled(request,id):
     return redirect('/')
 
 @login_required(login_url='regcomp')
-def billing(request):
+def gobilling(request):
     if 'uid' in request.session:
         if request.session.has_key('uid'):
             uid = request.session['uid']
@@ -29516,8 +29516,8 @@ def billing(request):
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
         pbill = purchasebill.objects.all()
-        return render(request,'app1/billing.html',{'cmp1': cmp1,'pbill':pbill})
-    return redirect('billing')
+        return render(request,'app1/gobilling.html',{'cmp1': cmp1,'pbill':pbill})
+    return redirect('gobilling')
     
 @login_required(login_url='regcomp')
 def addbilling(request):
@@ -29601,14 +29601,14 @@ def createbill(request):
                 mapped=zip(items,quantity,rate,tax,amount)
                 mapped=list(mapped)
                 for ele in mapped:
-                    billAdd,created = bill_item.objects.get_or_create(items = ele[0],quantity=ele[1],rate=ele[2],
+                    billAdd,created = purchasebill_item.objects.get_or_create(items = ele[0],quantity=ele[1],rate=ele[2],
                     tax=ele[3],amount=ele[4],bid=bll)
-            return redirect('billing')
-        return render(request,'app1/billing.html',{'cmp1': cmp1})
+            return redirect('gobilling')
+        return render(request,'app1/gobilling.html',{'cmp1': cmp1})
     return redirect('/') 
 
 @login_required(login_url='regcomp')
-def viewbill(request,id):
+def viewbilling(request,id):
     if 'uid' in request.session:
         if request.session.has_key('uid'):
             uid = request.session['uid']
@@ -29616,9 +29616,9 @@ def viewbill(request,id):
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
         pbill=purchasebill.objects.get(billid=id)
-        bitem = bill_item.objects.all().filter(bid=id)
-        return render(request,'app1/view_bill.html',{'cmp1': cmp1,'pbill':pbill,'bitem':bitem})
-    return redirect('billing')
+        bitem = purchasebill_item.objects.all().filter(bid=id)
+        return render(request,'app1/viewpurchasebill.html',{'cmp1': cmp1,'pbill':pbill,'bitem':bitem})
+    return redirect('gobilling')
 
 @login_required(login_url='regcomp')
 def goeditbill(request,id):
@@ -29629,7 +29629,7 @@ def goeditbill(request,id):
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
         pbill=purchasebill.objects.get(billid=id)
-        bitem = bill_item.objects.all().filter(bid=id)
+        bitem = purchasebill_item.objects.all().filter(bid=id)
         vndr = vendor.objects.all()
         itm = itemtable.objects.all()
         cust = customer.objects.all()
@@ -29641,10 +29641,10 @@ def goeditbill(request,id):
                     'pbill':pbill,
                     'bitem':bitem         
                 }
-        return render(request,'app1/edit_purchasebill.html',context)
-    return redirect('billing')
+        return render(request,'app1/editpurchasebill.html',context)
+    return redirect('gobilling')
 
-def edit_bill(request,id):
+def editpurchasebill(request,id):
     if 'uid' in request.session:
         if request.session.has_key('uid'):
             uid = request.session['uid']
@@ -29693,10 +29693,10 @@ def edit_bill(request,id):
                 mapped=zip(items,quantity,rate,tax,amount)
                 mapped=list(mapped)
                 for ele in mapped:
-                    porderAdd,created = bill_item.objects.get_or_create(items = ele[0],quantity=ele[1],rate=ele[2],
+                    porderAdd,created = purchasebill_item.objects.get_or_create(items = ele[0],quantity=ele[1],rate=ele[2],
                     tax=ele[3],amount=ele[4],bid=bitem)
-            return redirect('billing')
-        return render(request,'app1/billing.html',{'cmp1': cmp1})
+            return redirect('gobilling')
+        return render(request,'app1/gobilling.html',{'cmp1': cmp1})
     return redirect('/') 
 
 @login_required(login_url='regcomp')
@@ -29708,11 +29708,11 @@ def deletebill(request, id):
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
         pbill=purchasebill.objects.get(billid=id)
-        bitem = bill_item.objects.all().filter(bid=id)
+        bitem = purchasebill_item.objects.all().filter(bid=id)
         pbill.delete() 
         bitem.delete() 
-        return redirect('billing')
-    return redirect('billing')
+        return redirect('gobilling')
+    return redirect('gobilling')
 
 def billconvert(request,id):
     if 'uid' in request.session:
@@ -29724,7 +29724,7 @@ def billconvert(request,id):
         pbill = purchasebill.objects.get(billid=id)
         pbill.status = 'Billed'
         pbill.save()
-        return redirect(viewbill,id)
+        return redirect(viewbilling,id)
     return redirect('/')
 
 def getdata2(request):
@@ -29792,7 +29792,7 @@ def addexpenses(request):
         return render(request,'app1/addexpense.html',context)
     return redirect('/') 
 
-def create_expense(request):
+def createexpense(request):
     if 'uid' in request.session:
         if request.session.has_key('uid'):
             uid = request.session['uid']
@@ -30005,7 +30005,7 @@ def addpurchasepymnt(request):
         cmp1 = company.objects.get(id=request.session['uid'])
         vndr = vendor.objects.all()  
         pymt = paymentmethod.objects.all()  
-        return render(request,'app1/purchasepayment.html',{'cmp1':cmp1,'vndr':vndr,'pymt':pymt})
+        return render(request,'app1/addpurchasepymnt.html',{'cmp1':cmp1,'vndr':vndr,'pymt':pymt})
     return redirect('/')
 
 def createpurchasepymnt(request):

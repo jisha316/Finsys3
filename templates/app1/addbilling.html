@@ -78,16 +78,14 @@
                         <div class="row">
                             <div class="col-md-3 mt-2">
                                 <label for="">Source of Supply</label>
-                                <select name="sourceofsupply" id="plosu" class="form-control">
-                                    <option value="{{ cmp1.state }}" selected> {{ cmp1.state }}</option>
+                                <select name="sourceofsupply" id="plosu" class="form-control" onchange="state(this)">
+                                    <option value="{{ cmp1.state }}" selected>[KL] {{ cmp1.state }}</option>
                                     <option value="[AN] Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
                                     <option value="[AD] Andhra Predhesh">[AD] Andhra Predhesh</option>
                                     <option value="[AR] Arunachal Predesh">[AR] Arunachal Predesh</option>
                                     <option value="[AS] Assam">[AS] Assam</option>
                                     <option value="[BR] Bihar">[BR] Bihar</option>
-                                    <option value="[CH] Chandigarh">[CH] Chandigarh</option>
-                                    <option value="[CG] Chhattisgarh">[CG] Chhattisgarh</option>
-                                    <option value="[DNH] Dadra and Nagar Haveli">[DNH] Dadra and Nagar Haveli</option>
+                                    <option value="[CH] Chandigarh">[CH] Chandigarh</option> Haveli</option>
                                     <option value="[DD] Damn anad Diu">[DD] Damn anad Diu</option>
                                     <option value="[DL] Delhi">[DL] Delhi</option>
                                     <option value="[GA] Goa">[GA] Goa</option>
@@ -98,6 +96,8 @@
                                     <option value="[JH] Jharkhand">[JH] Jharkhand</option>
                                     <option value="[KA] Karnataka">[KA] Karnataka</option>
                                     <option value="[KL] Kerala">[KL] Kerala</option>
+                                    <option value="[CG] Chhattisgarh">[CG] Chhattisgarh</option>
+                                    <option value="[DNH] Dadra and Nagar Haveli">[DNH] Dadra and Nagar
                                     <option value="[LA] Ladakh">[LA] Ladakh</option>
                                     <option value="[LD] Lakshadweep">[LD] Lakshadweep</option>
                                     <option value="[MP] Madhya Predesh">[MP] Madhya Predesh</option>
@@ -180,7 +180,7 @@
                                 <select name="contact_name" id="select1" class="custom-select">
                                     <option selected disabled>Choose</option>
                                     {% for c in cust %}
-                                    <option value="{{ c.firstname }} {{ c.lastname }}">{{ c.firstname }} {{ c.lastname }}</option>
+                                        <option value="{{ c.firstname }} {{ c.lastname }}">{{ c.firstname }} {{ c.lastname }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -278,7 +278,7 @@
                                                 class="form-control price" step="0.00" min="0">
                                             </td> 
                                             <td>
-                                                <select name="tax[]" id="tax" class="form-control tax">
+                                                <select name="tax[]" id="tax1" class="form-control tax">
                                                     <option id="ta1" value=0 text={{ cmp1.state }}>Choose</option>
                                                     <option value=28 text={{ cmp1.state }}>28.0% GST(28%)</option>
                                                     <option value=18 text={{ cmp1.state }}>18.0% GST(18%)</option>
@@ -374,14 +374,14 @@
                                         </div>
                                         <div class="col-sm-4 m-0 p-0"></div>
                                     </div>
-                                    <div class="row container-fluid hide p-2 m-0" id="cgst1">
+                                    <div class="row container-fluid p-2 m-0" style="display: none;" id="cgst1">
                                         <div class="col-sm-4 mt-2"><label for="a" class="text-center">CGST</label></div>
                                         <div class="col-sm-8 mt-2"><input type="number" name='cgst' step="any" id="cgst" placeholder=0 
                                             class="form-control"/>
                                         </div>
                                         <div class="col-sm-4 m-0 p-0"></div>
                                     </div>
-                                    <div class="row container-fluid hide p-2 m-0" id="sgst1">
+                                    <div class="row container-fluid p-2 m-0" style="display: none;" id="sgst1">
                                         <div class="col-sm-4 mt-2"><label for="a" class="text-center">SGST</label></div>
                                         <div class="col-sm-8 mt-2"><input type="number" name='sgst' step="any" id="sgst" placeholder=0 
                                             class="form-control"/>
@@ -1700,26 +1700,7 @@
                     var qty = $(this).find('.qty').val();
                     var price = $(this).find('.price').val();
                     var tax = $(this).find('.tax').val();
-                    var disc = $(this).find('.disc').val();
-
-                    // var xyz = document.getElementById("tax").value
-
-                    // if(xyz ==1 || xyz ==2  )
-                    //     tax=28
-                    // if(xyz ==3 || xyz ==4  )
-                    //     tax=18    
-                    // if(xyz ==5 || xyz ==6  )
-                    //     tax=12
-                    // if(xyz ==7 || xyz ==8  )
-                    //     tax=6 
-                    // if(xyz ==9 || xyz ==10  )
-                    //     tax=5
-                    // if(xyz ==11 || xyz ==12  )
-                    //     tax=3 
-                    // if(xyz ==13 || xyz ==14  )
-                    //     tax=.25 
-                    // if(xyz ==15 )
-                    //     tax=.25        
+                    var disc = $(this).find('.disc').val();     
 
                     $(this).find('.total').val(parseFloat(qty * price));
                     $(this).find('.taxamount').val(parseFloat((qty * price) * (parseFloat(tax) / 100)));
@@ -1736,11 +1717,6 @@
                 total += parseFloat($(this).val());
             });
 
-            // cgst =0;
-            // sgst = 0;
-            // igst=0;
-            tcsamount = 0;
-
             taxamount = 0.0;
             $('.taxamount').each(function() {
                 taxamount += parseFloat($(this).val());
@@ -1748,19 +1724,13 @@
 
             $('#subtotal').val(parseFloat(total.toFixed(2)));
             $('#tax_amount').val(parseFloat(taxamount.toFixed(2)));
-            $('#tcs_amount').val(tcsamount.toFixed(2));
-
-            // tax_sum = total / 100 * $('#tax').val();
             calc_tcs();
         }
         function calc_tcs() {
             tcsamount = 0;
-    
             var a = document.getElementById("tcs1").value
             var discount = document.getElementById("disc1").value
-            
             tcs=0
-    
             tcs =a/100 * total
             let z=Math.round(tcs)
             disc0=discount
@@ -1785,40 +1755,23 @@
                 $('#cgst').val(parseFloat(gst.toFixed(2)));
                 $('#sgst').val(parseFloat(gst.toFixed(2)));
                 $('#igst').val(parseFloat(d.toFixed(2)));
-            
-                }
+            }
                 
             if (bc != "{{ cmp1.state }}"  ) {
-                $('#igst').val(parseFloat(taxamount.toFixed(2)));
+                $('#igst').val(taxamount.toFixed(2));
                 $('#cgst').val(d.toFixed(2));
                 $('#sgst').val(d.toFixed(2));
             }
-
         }
-        //     var bc = document.getElementById("tax").value
-        //     d=0
-        //     if (bc ==1 || bc ==3 || bc ==5 || bc ==7 || bc ==9 || bc ==11 || bc ==13|| bc ==15 ) {
-        //         $('#cgst').val((taxamount/2).toFixed(2));
-        //         $('#sgst').val((taxamount/2).toFixed(2));
-        //         $('#igst').val(d.toFixed(2)); 
-        //         }
-        //     if (bc ==2 || bc ==4 || bc ==6 || bc ==8 || bc ==10|| bc ==12 || bc ==14 ){
-        //         $('#igst').val(taxamount.toFixed(2)); 
-        //         $('#cgst').val(d.toFixed(2));
-        //         $('#sgst').val(d.toFixed(2));
-        //     }
-        // }
     </script>
 
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script>
         function state(element) {
-            
-            if (element.value == 'Kerala' ) {
+            if (element.value == "Kerala" ) {
                 document.getElementById('cgst1').style.display = 'flex';
                 document.getElementById('sgst1').style.display = 'flex';
-                document.getElementById('igst1').style.display = 'none';
-                
-                
+                document.getElementById('igst1').style.display = 'none'; 
             } else {
                 document.getElementById('cgst1').style.display = 'none';
                 document.getElementById('sgst1').style.display = 'none';
@@ -1826,25 +1779,7 @@
             }
         }
     </script>
-
-    <!-- <script>
-        function filtertax() {
-            var status = document.getElementById("tax");
-                var a = status.value
-                console.log(a);
-                if( a == '1' || a == '3' || a == '5' | a == '7' || a == '9' || a == '11' || a == '13' || a== '0' ){
-                    console.log(a);
-
-                    document.getElementById('cgst1').style.display = 'flex';
-                    document.getElementById('sgst1').style.display = 'flex';
-                    document.getElementById('igst1').style.display = 'none'; 
-                } else {
-                    document.getElementById('cgst1').style.display = 'none';
-                    document.getElementById('sgst1').style.display = 'none';
-                    document.getElementById('igst1').style.display = 'flex';      
-                }
-        }
-    </script> -->
+    
     <script>
         $(document).ready(function(){
             $(".toggler").click(function(e){

@@ -30,7 +30,7 @@
                     <h4 class="mb-0">Vendor Details</h4>
                 </div>
                 <hr/>
-                <form action="edit_bill/{{ pbill.billid }} {{bitem.bid}}" method="post" autocomplete="off">
+                <form action="editpurchasebill/{{ pbill.billid }} {{bitem.bid}}" method="post" autocomplete="off">
                     {% csrf_token %}
                     
                     {% if user.is_authenticated %}

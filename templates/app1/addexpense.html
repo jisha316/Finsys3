@@ -19,7 +19,7 @@
         </div>
         <div class="card radius-15" style="background-color: #243e54;">
             <div class="card-body">
-                <form action="{% url 'create_expense' %}" method="post" autocomplete="off">
+                <form action="{% url 'createexpense' %}" method="post" autocomplete="off">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-3 mt-2">

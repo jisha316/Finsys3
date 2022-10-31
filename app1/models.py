@@ -1489,7 +1489,7 @@ class purchaseorder(models.Model):
     
     status =models.CharField(max_length=150,choices=porder_status,default='Draft')
 
-class porder_item(models.Model):
+class purchaseorder_item(models.Model):
     pid = models.ForeignKey(purchaseorder, on_delete=models.CASCADE,null=True)
     items = models.CharField(max_length=100)
     quantity = models.CharField(max_length=100,null=True)
@@ -1534,7 +1534,7 @@ class purchasebill(models.Model):
     )
     status =models.CharField(max_length=150,choices=bill_status,default='Draft')
 
-class bill_item(models.Model):
+class purchasebill_item(models.Model):
     bid = models.ForeignKey(purchasebill, on_delete=models.CASCADE,null=True)
     items = models.CharField(max_length=100)
     quantity = models.CharField(max_length=100,null=True)

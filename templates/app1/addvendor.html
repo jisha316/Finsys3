@@ -23,7 +23,7 @@
                     <h4 class="mb-0">Vendor Details</h4>
                 </div>
                 <hr/>
-                <form action="vendordetails" method="post" class="needs-validation" novalidate autocomplete="off">
+                <form action="createvendor" method="post" class="needs-validation" novalidate autocomplete="off">
                     {% csrf_token %}
                     {% if user.is_authenticated %}
                         <div class="row">
