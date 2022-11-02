@@ -28311,14 +28311,14 @@ def item_trans(request,id):
         item = itemtable.objects.filter(id=id)
         sales = salesorder.objects.filter(cid=cmp1)
         purchase = purchaseorder.objects.all()
-        pitems  = porder_item.objects.all()
+        pitems  = purchaseorder_item.objects.all()
         sitems  = sales_item.objects.all()
         est = estimate.objects.filter(cid=cmp1)
         eitems = estimate_item.objects.all()
         inv = invoice.objects.filter(cid=cmp1)
         iitems = invoice_item.objects.all()
         bill = purchasebill.objects.all()
-        bitems = bill_item.objects.all()
+        bitems = purchasebill_item.objects.all()
         context = {'item':item,'bill':bill,'bitems':bitems,'inv':inv,'iitems':iitems,'sales':sales,'pitems':pitems,'sitems':sitems,'cmp1': cmp1,'purchase':purchase,'est':est,'eitems':eitems}
         return render(request,'app1/item_transactions.html',context) 
         
@@ -28829,6 +28829,17 @@ def createvendor(request):
                             shippincode=shippincode, shipcountry=shipcountry,cid=cmp1)
 
             vndr.save()
+
+            if vndr.openingbalance != "":
+                add_vndr_stat=vendor_statment(
+                    vendor = vndr.firstname +" "+ vndr.lastname,
+                    cid  = cmp1,
+                    # date = vndr.date,
+                    transactions="Vendor Opening Balance",
+                    amount= vndr.openingbalance,
+                )
+                add_vndr_stat.save()
+
             return redirect('govendor')
         return render(request,'app1/addvendor.html',{'cmp1': cmp1})
     return redirect('/')
@@ -28860,11 +28871,11 @@ def viewvendor(request, id):
 
         bal=0
         for i in statment:
-            if i.transactions =="Billed":
+            # if i.transactions =="Billed":
                 
-                i.balance = bal + i.amount
-                if i.balance:
-                    bal += i.balance
+            #     i.balance = bal + i.amount
+            #     if i.balance:
+            #         bal += i.balance
             if i.transactions =="Payment Received":
                 i.balance = bal-i.payments
             i.save() 
@@ -29158,37 +29169,37 @@ def vendordetails3(request):
 
 @login_required(login_url='regcomp')
 def new_customersp(request):
-    try:
-        cmp1 = company.objects.get(id=request.session["uid"])
+    if 'uid' in request.session:
+        if request.session.has_key('uid'):
+            uid = request.session['uid']
+        else:
+            return redirect('/')
+        cmp1 = company.objects.get(id=request.session['uid'])
         if request.method == "POST":
             firstname = request.POST['firstname']
             lastname = request.POST['lastname']
             if customer.objects.filter(firstname=firstname, lastname=lastname, cid=cmp1).exists():
-                messages.info(request,
-                              f"Customer {firstname} {lastname} already exists. Please provide a different name.")
+                messages.info(request, f"Customer {firstname} {lastname} already exists. Please provide a different name.")
                 return redirect('gocustomers')
             else:
                 customer1 = customer(title=request.POST['title'], firstname=request.POST['firstname'],
-                                     lastname=request.POST['lastname'], company=request.POST['company'],
-                                     location=request.POST['location'], gsttype=request.POST['gsttype'],
-                                     gstin=request.POST['gstin'], panno=request.POST['panno'],
-                                     email=request.POST['email'],
-                                     website=request.POST['website'], mobile=request.POST['mobile'],
-                                     street=request.POST['street'], city=request.POST['city'],
-                                     state=request.POST['state'],
-                                     pincode=request.POST['pincode'], country=request.POST['country'],
-                                     shipstreet=request.POST['shipstreet'], shipcity=request.POST['shipcity'],
-                                     shipstate=request.POST['shipstate'],
-                                     shippincode=request.POST['shippincode'], shipcountry=request.POST['shipcountry'],
-                                     cid=cmp1)
+                                    lastname=request.POST['lastname'], company=request.POST['company'],
+                                    location=request.POST['location'], gsttype=request.POST['gsttype'],
+                                    gstin=request.POST['gstin'], panno=request.POST['panno'],
+                                    email=request.POST['email'],
+                                    website=request.POST['website'], mobile=request.POST['mobile'],
+                                    street=request.POST['street'], city=request.POST['city'],
+                                    state=request.POST['state'],
+                                    pincode=request.POST['pincode'], country=request.POST['country'],
+                                    shipstreet=request.POST['shipstreet'], shipcity=request.POST['shipcity'],
+                                    shipstate=request.POST['shipstate'],
+                                    shippincode=request.POST['shippincode'], shipcountry=request.POST['shipcountry'],
+                                    cid=cmp1)
 
                 customer1.save()
                 return redirect('addexpenses')
-        customers = customer.objects.filter(cid=cmp1).all()
-        context = {'customers': customers, 'cmp1': cmp1}
-        return render(request, 'app1/addexpense.html', context)
-    except:
-        return redirect('addexpenses')
+        return render(request, 'app1/addexpense.html', {'cmp1': cmp1})
+    return redirect('/')
 
 def getvendordata(request):
     if 'uid' in request.session:
@@ -29589,6 +29600,17 @@ def createbill(request):
             billed.bill_no = int(billed.bill_no) + billed.billid
             billed.save()
 
+            statment2=vendor_statment()
+            statment2.vendor = billed.vendor_name
+            statment2.cid = cmp1
+            statment2.transactions = "Billed"
+            statment2.pbill = billed
+            statment2.details = billed.bill_no
+            statment2.details2 = reference
+            statment2.date = billed.date
+            statment2.payments = billed.grand_total
+            statment2.save()
+
             items = request.POST.getlist("items[]")
             quantity = request.POST.getlist("quantity[]")
             rate = request.POST.getlist("rate[]")
@@ -29603,6 +29625,16 @@ def createbill(request):
                 for ele in mapped:
                     billAdd,created = purchasebill_item.objects.get_or_create(items = ele[0],quantity=ele[1],rate=ele[2],
                     tax=ele[3],amount=ele[4],bid=bll)
+
+                    itemqty = itemtable.objects.get(name=ele[0],cid=cmp1)
+                    if itemqty.stock != 0:
+                        temp=0
+                        temp = itemqty.stock 
+
+                        temp = temp-int(ele[1])
+                        itemqty.stock =temp
+                        itemqty.save()
+
             return redirect('gobilling')
         return render(request,'app1/gobilling.html',{'cmp1': cmp1})
     return redirect('/') 
@@ -29695,6 +29727,7 @@ def editpurchasebill(request,id):
                 for ele in mapped:
                     porderAdd,created = purchasebill_item.objects.get_or_create(items = ele[0],quantity=ele[1],rate=ele[2],
                     tax=ele[3],amount=ele[4],bid=bitem)
+
             return redirect('gobilling')
         return render(request,'app1/gobilling.html',{'cmp1': cmp1})
     return redirect('/') 
@@ -30033,6 +30066,7 @@ def createpurchasepymnt(request):
             statment2.cid = cmp1
             statment2.transactions = "Payable"
             statment2.paymnt = pymnt1
+            statment2.details = pymnt1.reference
             statment2.date = pymnt1.paymentdate
             statment2.payments = pymnt1.paymentamount
             statment2.save()
@@ -30155,9 +30189,30 @@ def addpurchasedebit(request):
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
         vndr = vendor.objects.all()  
-        item = itemtable.objects.all()  
-        return render(request,'app1/addpurchasedebit.html',{'cmp1': cmp1,'vndr':vndr,'item':item})
+        pbill = purchasebill.objects.all()  
+        item = itemtable.objects.all() 
+        context = {'cmp1': cmp1,'vndr':vndr,'item':item,'pbill':pbill} 
+        return render(request,'app1/addpurchasedebit.html',context)
     return redirect('gopurchasedebit') 
+
+def itemdata(request):
+    if 'uid' in request.session:
+        if request.session.has_key('uid'):
+            uid = request.session['uid']
+        else:
+            return redirect('/')
+        cmp1 = company.objects.get(id=request.session['uid'])
+        id = request.GET.get('id')
+
+        item = itemtable.objects.get(name=id,cid=cmp1)
+        print(item)
+        hsn = item.hsn
+        qty = item.stock
+        price = item.sales_cost
+        gst = item.intra_st
+        sgst = item.inter_st
+        return JsonResponse({"status":" not",'hsn':hsn,'qty':qty,'price':price,'gst':gst,'sgst':sgst,})
+    return redirect('/')
 
 def createpurchasedebit(request):
     if 'uid' in request.session:
@@ -30170,10 +30225,14 @@ def createpurchasedebit(request):
             debit_no = '1000'
             pdebit = purchasedebit(vendor = request.POST['vendor'],
                                     address = request.POST['address'],
+                                    email=request.POST['email'],
                                     debitdate=request.POST['debitdate'],
+                                    supply=request.POST['supply'],
+                                    billno=request.POST['billno'],
                                     subtotal=request.POST['subtotal'],
                                     taxamount=request.POST['taxamount'],
-                                    grandtotal=request.POST['grandtotal']
+                                    grandtotal=request.POST['grandtotal'],
+                                    cid=cmp1
                                 )
             pdebit.save()
             pdebit.debit_no = int(pdebit.debit_no) + pdebit.pdebitid
@@ -30194,6 +30253,16 @@ def createpurchasedebit(request):
                 for ele in mapped:
                     porderAdd,created = purchasedebit1.objects.get_or_create(items = ele[0],quantity=ele[1],price=ele[2],
                     tax=ele[3],total=ele[4],pdebit=pdeb)
+
+                    itemqty = itemtable.objects.get(name=ele[0],cid=cmp1)
+                    if itemqty.stock != 0:
+                        temp=0
+                        temp = itemqty.stock 
+
+                        temp = temp-int(ele[1])
+                        itemqty.stock =temp
+                        itemqty.save()
+
             return redirect('gopurchasedebit')
         return render(request,'app1/addpurchasedebit.html',{'cmp1': cmp1})
     return redirect('/') 
@@ -30218,6 +30287,7 @@ def purchase_acctransactions(request,id):
         else:
             return redirect('/')
         cmp1 = company.objects.get(id=request.session['uid'])
+
         x = id.split()
         x.append(" ")
         a = x[0]
@@ -30233,43 +30303,27 @@ def purchase_acctransactions(request,id):
         print(opnbal) 
         
         statment = vendor_statment.objects.filter(vendor=id,cid=cmp1)
+        total1 = purchasebill.objects.filter(cid=cmp1,vendor_name=id).all().aggregate(t2=Sum('balance_due'))
+
         debit=0
         credit=0
-        total1 = 0
+        total2 = 0
 
         for i in statment :
-            if i.amount:
-                debit+=i.amount
-            if i.payments:
+            if i.transactions =="Billed":
                 credit+=i.payments
 
-        total1=debit-credit          
-
-        bal=vndrobject.openingbalance
-        for i in statment:
-            if i.transactions =="Billed":
-                i.balance = bal + i.amount
-                bal = i.balance
-            # if i.transactions =="Payable":
-                # i.balance = bal - i.payments
-                # bal = i.balance
-            i.save() 
-        print(bal)
+            if i.transactions =="Payable":
+                debit+=i.payments
+        
+            if i.payments:
+                total2+=i.payments
 
         fdate =""
         ldate =""
 
-        context = {
-            "statment":statment,
-            "cmp1":cmp1,
-            'total1':total1,
-            'credit':credit,
-            'debit':debit,
-            'vndr2':id,
-            'to':to,
-            'fdate':fdate,
-            'ldate':ldate,
-            
+        context = {'statment':statment, 'cmp1':cmp1, 'total1':total1, 'total2':total2, 'credit':credit, 'debit':debit, 'vndr2':id, 'to':to,
+            'fdate':fdate, 'ldate':ldate,    
         }
         return render(request,'app1/purchase_acctransactions.html',context)
     return redirect('/')
@@ -30295,63 +30349,25 @@ def purchase_acctransactions1(request):
             opnbal =vndrobject.openingbalance
             print(opnbal) 
 
-            statment1 = vendor_statment.objects.filter(vendor=cu,cid=cmp1)
-            bal=0
-            for i in statment1:
-                if i.transactions =="Billed":
-                    if i.amount:
-                        i.balance = bal + i.amount
-                        bal = i.balance
-                if i.transactions =="Payable":
-                    if i.payments:
-                        i.balance = bal-i.payments
-                i.save() 
-
-            preamount=0
-            prepayment=0
-            prebalance = 0
-            prev_balance = vendor_statment.objects.filter(vendor=cu,date__lt=fdate)
-            for j in prev_balance:
-                if j.amount:
-                    preamount += j.amount
-
-                if j.payments:
-                    prepayment += j.payments
-    
-
-            prebalance = preamount-prepayment
-            print(prebalance)   
-
             statment = vendor_statment.objects.filter(vendor=cu,cid=cmp1,date__gte=fdate,date__lte=ldate)
-            bal=0
-            for i in statment:
-                if i.transactions =="Billed":
-                    if i.amount:
-                        i.balance = bal + i.amount
-                        bal = i.balance
-                if i.transactions =="Payable":
-                    if i.payments:
-                        i.balance = bal-i.payments
-                i.save()  
-            value = ""
-            if statment.exists():
-                value=1
+            total1 = purchasebill.objects.filter(cid=cmp1,vendor_name=cu,date__gte=fdate,date__lte=ldate).all().aggregate(t2=Sum('balance_due'))
 
             debit=0
             credit=0
-            total1 = 0
-    
-            for i in statment :
-                if i.amount:
-                    debit+=i.amount
-                if i.payments:
-                    credit+=i.payments
-            total1=prebalance+debit-credit   
+            total2 = 0
 
-            bal=vndrobject.openingbalance
+            for i in statment :
+                if i.transactions =="Billed":
+                    credit+=i.payments
+
+                if i.transactions =="Payable":
+                    debit+=i.payments
             
-            context = {'statment':statment, 'cmp1':cmp1,'total1':total1,'credit':credit,'vndr2':vndr,'prebalance':prebalance,'fdate':fdate,
-                'ldate':ldate,'value':value,'debit':debit
+                if i.payments:
+                    total2+=i.payments
+            
+            context = {'statment':statment, 'cmp1':cmp1,'total1':total1, 'total2':total2, 'credit':credit, 'debit':debit, 'vndr2':vndr,
+                'fdate':fdate,'ldate':ldate,
             }
             return render(request,'app1/purchase_acctransactions.html',context)
 

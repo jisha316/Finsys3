@@ -568,7 +568,7 @@
                         </thead>
                         <tbody>
                             {% for p in pbl %}
-                                 <tr class="table-row tr" onclick=window.location='{% url "viewbill" p.billid %}';>
+                                 <tr class="table-row tr" onclick=window.location='{% url "viewbilling" p.billid %}';>
                                     <td style="text-align: center;">{{ p.date }}</td>
                                     <th style="text-align: center;">{{ p.bill_no }}</th>
                                     <td style="text-align: center;">{{ p.reference }}</td>
